@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkCloud - Детали проекта</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/project-detail.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>WorkCloud</h2>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html">Дашборд</a></li>
+                    <li><a href="projects.html">Проекты</a></li>
+                    <li><a href="profile.html">Профиль</a></li>
+                    <li><a href="#" onclick="logout(); return false;">Выйти</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1 id="project-title">Проект</h1>
+                <input type="text" placeholder="Поиск в проекте..." class="search-bar">
+                <button class="btn btn-primary" onclick="openFolderModal()">Создать папку</button>
+                <button class="btn btn-primary" onclick="openNoteModal()">Создать заметку</button>
+                <button class="btn btn-primary" onclick="openFileModal()">Загрузить файл</button>
+            </header>
+            <section id="project-items" class="item-list"></section>
+        </main>
+    </div>
+    <!-- Модальное окно для создания/редактирования папки -->
+    <div class="modal" id="folder-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('folder-modal')">&times;</span>
+            <h2>Создать папку</h2>
+            <form id="folder-form">
+                <div class="form-group">
+                    <label for="folder-name">Название</label>
+                    <input type="text" id="folder-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="folder-description">Описание</label>
+                    <textarea id="folder-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="folder-access">Доступ</label>
+                    <select id="folder-access">
+                        <option value="public">Общедоступный</option>
+                        <option value="private">Приватный</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="folder-code-group">
+                    <label for="folder-code">Код доступа</label>
+                    <input type="text" id="folder-code" maxlength="8">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <!-- Модальное окно для создания/редактирования заметки -->
+    <div class="modal" id="note-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('note-modal')">&times;</span>
+            <h2>Создать заметку</h2>
+            <form id="note-form">
+                <div class="form-group">
+                    <label for="note-type">Тип заметки</label>
+                    <select id="note-type">
+                        <option value="text">Текстовая</option>
+                        <option value="checklist">Чек-лист</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="note-content">Содержимое</label>
+                    <textarea id="note-content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="note-access">Доступ</label>
+                    <select id="note-access">
+                        <option value="public">Общедоступный</option>
+                        <option value="private">Приватный</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="note-code-group">
+                    <label for="note-code">Код доступа</label>
+                    <input type="text" id="note-code" maxlength="8">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/project-detail.js"></script>
+    <script>
+        requireAuth(); // Redirect to login if not authenticated
+    </script>
+</body>
+</html>

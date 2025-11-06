@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkCloud - Профиль</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>WorkCloud</h2>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html">Дашборд</a></li>
+                    <li><a href="projects.html">Проекты</a></li>
+                    <li><a href="profile.html" class="active">Профиль</a></li>
+                    <li><a href="#" onclick="logout(); return false;">Выйти</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1>Профиль</h1>
+            </header>
+            <section class="profile-info">
+                <div class="form-group">
+                    <label>Имя:</label>
+                    <span id="profile-name">Имя пользователя</span>
+                </div>
+                <div class="form-group">
+                    <label>Электронная почта:</label>
+                    <span id="profile-email">email@example.com</span>
+                </div>
+                <div class="form-group">
+                    <label>Роль:</label>
+                    <span id="profile-role">Пользователь</span>
+                </div>
+                <button class="btn btn-primary" onclick="openProfileModal()">Редактировать профиль</button>
+            </section>
+        </main>
+    </div>
+    <!-- Модальное окно для редактирования профиля -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('profile-modal')">&times;</span>
+            <h2>Редактировать профиль</h2>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label for="profile-name-input">Имя</label>
+                    <input type="text" id="profile-name-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-password">Новый пароль</label>
+                    <input type="password" id="profile-password">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/profile.js"></script>
+    <script>
+        requireAuth(); // Redirect to login if not authenticated
+    </script>
+</body>
+</html>

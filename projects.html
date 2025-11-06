@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkCloud - Проекты</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/projects.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>WorkCloud</h2>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html">Дашборд</a></li>
+                    <li><a href="projects.html" class="active">Проекты</a></li>
+                    <li><a href="profile.html">Профиль</a></li>
+                    <li><a href="#" onclick="logout(); return false;">Выйти</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1>Проекты</h1>
+                <input type="text" placeholder="Поиск проектов..." class="search-bar">
+                <button class="btn btn-primary" onclick="openProjectModal()">Создать проект</button>
+            </header>
+            <section id="project-list" class="item-list"></section>
+        </main>
+    </div>
+    <!-- Модальное окно для создания/редактирования проекта -->
+    <div class="modal" id="project-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('project-modal')">&times;</span>
+            <h2>Создать проект</h2>
+            <form id="project-form">
+                <div class="form-group">
+                    <label for="project-name">Название</label>
+                    <input type="text" id="project-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Описание</label>
+                    <textarea id="project-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-access">Доступ</label>
+                    <select id="project-access">
+                        <option value="public">Общедоступный</option>
+                        <option value="private">Приватный</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="project-code-group">
+                    <label for="project-code">Код доступа</label>
+                    <input type="text" id="project-code" maxlength="8">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/projects.js"></script>
+    <script>
+        requireAuth(); // Redirect to login if not authenticated
+    </script>
+</body>
+</html>

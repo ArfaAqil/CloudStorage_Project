@@ -1,0 +1,29 @@
+.profile-info {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+
+.profile-info .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.profile-info label {
+    flex: 0 0 150px;
+    font-weight: 500;
+}
+
+.profile-info span {
+    flex: 1;
+    font-size: 1rem;
+}
+
+.profile-info button {
+    margin-top: 20px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
