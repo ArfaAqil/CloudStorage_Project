@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkCloud - Дашборд</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/project-detail.css"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>WorkCloud</h2>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html" class="active">Дашборд</a></li>
+                    <li><a href="projects.html">Проекты</a></li>
+                    <li><a href="profile.html">Профиль</a></li>
+                    <li><a href="#" onclick="logout(); return false;">Выйти</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1>Дашборд</h1>
+                <input type="text" placeholder="Поиск..." class="search-bar">
+            </header>
+            <section class="stats">
+                <div class="card">Проекты: <span id="project-count">0</span></div>
+                <div class="card">Файлы: <span id="file-count">0</span></div>
+                <div class="card">Заметки: <span id="note-count">0</span></div>
+            </section>
+            <section class="recent">
+                <h2>Недавние проекты</h2>
+                <div id="recent-projects" class="item-list"></div>
+                <h2>Недавние заметки</h2>
+                <div id="recent-notes" class="item-list"></div>
+                <h2>Недавние файлы</h2>
+                <div id="recent-files" class="item-list"></div>
+            </section>
+        </main>
+    </div>
+    <script src="./js/main.js"></script>
+    <script src="./js/dashboard.js"></script>
+    <script>
+        requireAuth(); // Redirect to login if not authenticated
+    </script>
+</body>
+</html>
