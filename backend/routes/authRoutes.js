@@ -1,12 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
-// Импортируем наш контроллер
 const authController = require('../controllers/authController');
+const { authenticateToken } = require('../middleware/auth');
 
-// Когда придет POST-запрос на /register, вызвать функцию registerUser
+// POST /api/auth/register - регистрация
 router.post('/register', authController.registerUser);
-// НОВЫЙ МАРШРУТ: POST /api/login
+
+// POST /api/auth/login - вход
 router.post('/login', authController.loginUser);
-router.get('/profile', protect, authController.getUserProfile);
+
+// GET /api/auth/profile - получение профиля (требует аутентификации)
+router.get('/profile', authenticateToken, authController.getUserProfile);
+
+// PUT /api/auth/profile - обновление профиля (требует аутентификации)
+router.put('/profile', authenticateToken, authController.updateUserProfile);
+
+// DELETE /api/auth/profile - удаление профиля (требует аутентификации)
+router.delete('/profile', authenticateToken, authController.deleteUserProfile);
+
 module.exports = router;

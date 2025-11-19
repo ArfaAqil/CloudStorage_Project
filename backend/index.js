@@ -4,6 +4,7 @@ const authRoutes = require('./routes/authRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const itemRoutes = require('./routes/itemRoutes');
+const fileRoutes = require('./routes/files');
 const app = express();
 
 const PORT = 3000;
@@ -11,7 +12,7 @@ const PORT = 3000;
 
 app.use(cors());
 // MIDDLEWARE
-app.use(express.json()); // Для парсинга JSON-тел
+app.use(express.json()); 
 
 
 app.use('/api/auth', authRoutes);
