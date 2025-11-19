@@ -14,11 +14,8 @@
         <aside class="sidebar">
             <h2>WorkCloud</h2>
             <nav>
-                <ul>
-                    <li><a href="dashboard.html">Дашборд</a></li>
-                    <li><a href="projects.html">Проекты</a></li>
-                    <li><a href="profile.html" class="active">Профиль</a></li>
-                    <li><a href="#" onclick="logout(); return false;">Выйти</a></li>
+                <ul id="main-nav">
+                    <!-- Навигация будет добавлена с помощью JS -->
                 </ul>
             </nav>
         </aside>
@@ -65,6 +62,7 @@
     <script src="js/profile.js"></script>
     <script>
         requireAuth(); // Redirect to login if not authenticated
+        setupNavigation('profile.html'); // Указываем имя текущего файла
     </script>
 </body>
 </html>
