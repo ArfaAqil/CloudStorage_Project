@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkCloud - О проекте</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>WorkCloud</h2>
+            <nav>
+                <ul id="main-nav">
+                    <!-- Навигация будет добавлена с помощью JS -->
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1>О проекте "WorkCloud"</h1>
+            </header>
+            <section class="card" style="max-width: 800px; font-size: 1.1rem; line-height: 1.7;">
+                <p><strong>WorkCloud</strong> – это простое и безопасное локальное облачное хранилище, предназначенное для индивидуальной работы и небольших команд.</p>
+                <br>
+                <h3 style="color: #1a73e8; margin-bottom: 10px;">Ключевые особенности:</h3>
+                <ul>
+                    <li><strong>Локальное развертывание:</strong> Приложение устанавливается на вашем персональном компьютере или внутреннем сервере компании, что гарантирует полный контроль над данными без их передачи на внешние серверы.</li>
+                    <li><strong>Совместная работа:</strong> Организуйте работу в командах через общие проекты, обменивайтесь файлами, заметками и комментариями.</li>
+                    <li><strong>Гибкая организация:</strong> Структурируйте информацию с помощью проектов, папок, файлов и заметок.</li>
+                    <li><strong>Простота и удобство:</strong> Минималистичный интерфейс спроектирован для быстрого освоения и комфортной работы.</li>
+                    <li><strong>Безопасность:</strong> Все данные хранятся локально, а пароли и коды доступа надежно хэшируются.</li>
+                </ul>
+                <br>
+                <h3 style="color: #1a73e8; margin-bottom: 10px;">Целевая аудитория:</h3>
+                <p>
+                    <strong>Работники и команды:</strong> Фрилансеры, небольшие IT-команды и офисные сотрудники, которым нужен инструмент для совместной работы над проектами.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Обычные пользователи:</strong> Студенты, домашние пользователи и все, кто хочет удобно и безопасно хранить личные файлы и заметки.
+                </p>
+            </section>
+        </main>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        requireAuth();
+        setupNavigation('about.html');
+    </script>
+</body>
+</html>

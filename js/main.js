@@ -1,4 +1,5 @@
 // main.js
+
 // Simulated bcrypt-like hashing for localStorage (need to change for real bycript later)
 function hashPassword(password) {
     let hash = 0;
@@ -152,7 +153,10 @@ function openModal(modalId) {
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Logout function
@@ -162,8 +166,53 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// Initial migration
+// НОВАЯ ФУНКЦИЯ: Динамическая навигация
+function setupNavigation(activePage) {
+    const nav = document.getElementById('main-nav');
+    if (!nav) return;
+
+    const currentUser = Storage.getCurrentUser();
+    const navItems = [
+        { href: 'dashboard.html', text: 'Дашборд' },
+        { href: 'projects.html', text: 'Проекты' },
+        { href: 'profile.html', text: 'Профиль' },
+        { href: 'about.html', text: 'О проекте' },
+    ];
+    
+    // Добавляем админ-панель только для админов
+    if (currentUser && currentUser.role === 'admin') {
+        navItems.splice(3, 0, { href: 'admin.html', text: 'Админ-панель' });
+    }
+
+    let navHTML = '';
+    navItems.forEach(item => {
+        navHTML += `<li><a href="${item.href}" class="${activePage === item.href ? 'active' : ''}">${item.text}</a></li>`;
+    });
+    
+    navHTML += `<li><a href="#" onclick="logout(); return false;">Выйти</a></li>`;
+    nav.innerHTML = navHTML;
+}
+
+// НОВАЯ ФУНКЦИЯ: Создание первого администратора, если его нет
+function initAdmin() {
+    const users = Storage.getUsers();
+    if (users.length === 0) {
+        const adminUser = {
+            name: 'Admin',
+            email: 'admin@workcloud.com',
+            password: hashPassword('admin123'),
+            role: 'admin'
+        };
+        users.push(adminUser);
+        Storage.saveUsers(users);
+        console.log('Default admin user created. Email: admin@workcloud.com, Password: admin123');
+    }
+}
+
+// Initial setup
+initAdmin();
 Storage.migrateProjects();
 
-// Expose logout to global scope
+// Expose functions to global scope
 window.logout = logout;
+window.setupNavigation = setupNavigation;
