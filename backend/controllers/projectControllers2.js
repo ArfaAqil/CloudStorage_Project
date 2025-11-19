@@ -49,16 +49,17 @@ const getProjects = async (req, res) => {
         res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
     }
 };
+
+// --- Получение проекта по ID ---
 const getProjectById = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const projectId = req.params.id; // Получаем ID проекта из URL (например, /api/projects/1)
+        const projectId = req.params.id;
 
         // 1. Получаем сам проект и проверяем, что он существует и пользователь имеет к нему доступ
         const [projects] = await db.query('SELECT * FROM projects WHERE id = ? AND owner_id = ?', [projectId, userId]);
 
         if (projects.length === 0) {
-            // Если такого проекта нет или он не принадлежит пользователю
             return res.status(404).json({ message: 'Проект не найден или у вас нет к нему доступа.' });
         }
         const project = projects[0];
@@ -74,8 +75,109 @@ const getProjectById = async (req, res) => {
         res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
     }
 };
+
+// --- РЕДАКТИРОВАНИЕ ПРОЕКТА ---
+const updateProject = async (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const userId = req.user.userId;
+        const { name, description, access } = req.body;
+
+        // 1. Проверяем существование проекта и права владельца
+        const [projects] = await db.query(
+            'SELECT * FROM projects WHERE id = ? AND owner_id = ?',
+            [projectId, userId]
+        );
+
+        if (projects.length === 0) {
+            return res.status(404).json({ message: 'Проект не найден или у вас нет прав для редактирования.' });
+        }
+
+        // 2. Валидация входных данных
+        if (name !== undefined && !name.trim()) {
+            return res.status(400).json({ message: 'Название проекта не может быть пустым.' });
+        }
+
+        // 3. Подготавливаем поля для обновления
+        const updateFields = [];
+        const updateValues = [];
+
+        if (name !== undefined) {
+            updateFields.push('name = ?');
+            updateValues.push(name.trim());
+        }
+
+        if (description !== undefined) {
+            updateFields.push('description = ?');
+            updateValues.push(description.trim() || null);
+        }
+
+        if (access !== undefined) {
+            updateFields.push('access = ?');
+            updateValues.push(access);
+        }
+
+        // Добавляем updated_at
+        updateFields.push('updated_at = CURRENT_TIMESTAMP');
+
+        // 4. Выполняем обновление
+        updateValues.push(projectId, userId);
+
+        await db.query(
+            `UPDATE projects SET ${updateFields.join(', ')} WHERE id = ? AND owner_id = ?`,
+            updateValues
+        );
+
+        // 5. Возвращаем обновленный проект
+        const [updatedProjects] = await db.query('SELECT * FROM projects WHERE id = ?', [projectId]);
+
+        res.status(200).json({
+            message: 'Проект успешно обновлен',
+            project: updatedProjects[0]
+        });
+
+    } catch (error) {
+        console.error(`Ошибка при обновлении проекта ${req.params.id}:`, error);
+        res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
+    }
+};
+
+// --- УДАЛЕНИЕ ПРОЕКТА ---
+const deleteProject = async (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const userId = req.user.userId;
+
+        // 1. Проверяем существование проекта и права владельца
+        const [projects] = await db.query(
+            'SELECT * FROM projects WHERE id = ? AND owner_id = ?',
+            [projectId, userId]
+        );
+
+        if (projects.length === 0) {
+            return res.status(404).json({ message: 'Проект не найден или у вас нет прав для удаления.' });
+        }
+
+        // 2. Выполняем удаление проекта
+        // Благодаря ON DELETE CASCADE в базе данных, все связанные items
+        // и записи в project_collaborators удалятся автоматически
+        await db.query('DELETE FROM projects WHERE id = ?', [projectId]);
+
+        // 3. Отправляем подтверждение удаления
+        res.status(200).json({
+            message: 'Проект и все связанные данные успешно удалены'
+        });
+
+    } catch (error) {
+        console.error(`Ошибка при удалении проекта ${req.params.id}:`, error);
+        res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
+    }
+};
+
 module.exports = {
     createProject,
     getProjects,
-    getProjectById
+    getProjectById,
+    updateProject,
+    deleteProject
 };
