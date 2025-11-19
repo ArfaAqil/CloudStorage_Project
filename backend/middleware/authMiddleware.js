@@ -1,28 +1,38 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const protect = (req, res, next) => {
-    let token;
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            // 2. Извлекаем сам токен, отбрасывая слово "Bearer"
-            token = req.headers.authorization.split(' ')[1];
+const authenticateToken = async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-            const decoded = jwt.verify(token, process.env.SECRET_KEY);
-
-            req.user = decoded;
-
-            // 5. Передаем управление следующему middleware или основному обработчику
-            next();
-        } catch (error) {
-            console.error('Ошибка верификации токена:', error);
-            res.status(401).json({ message: 'Нет авторизации, токен недействителен' });
+        if (!token) {
+            return res.status(401).json({ 
+                message: 'Токен доступа не предоставлен.' 
+            });
         }
-    }
 
-    if (!token) {
-        res.status(401).json({ message: 'Нет авторизации, токен не найден' });
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.user = decoded; // Добавляем данные пользователя в запрос
+        next();
+
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(403).json({ 
+                message: 'Неверный токен.' 
+            });
+        }
+        if (error.name === 'TokenExpiredError') {
+            return res.status(403).json({ 
+                message: 'Токен истек.' 
+            });
+        }
+        
+        console.error('Ошибка аутентификации:', error);
+        res.status(500).json({ 
+            message: 'Ошибка аутентификации.' 
+        });
     }
 };
 
-module.exports = { protect };
+module.exports = { authenticateToken };

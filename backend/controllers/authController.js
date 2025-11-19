@@ -2,6 +2,7 @@ const db = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+
 // Контроллер для регистрации пользователя
 const registerUser = async (req, res) => {
     try {
@@ -34,6 +35,7 @@ const registerUser = async (req, res) => {
         res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
     }
 };
+
 const loginUser = async (req, res) => {
     try {
         // 1. Получаем email и пароль из запроса
@@ -77,8 +79,8 @@ const loginUser = async (req, res) => {
         res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
     }
 };
-const getUserProfile = async (req, res) => {
 
+const getUserProfile = async (req, res) => {
     try {
         const [users] = await db.query('SELECT id, name, email, role, created_at FROM users WHERE id = ?', [req.user.userId]);
 
@@ -92,9 +94,136 @@ const getUserProfile = async (req, res) => {
         res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
     }
 };
-// Экспортируем функцию, чтобы ее можно было использовать в других файлах
+
+// ОБНОВЛЕННАЯ ФУНКЦИЯ: Обновление профиля пользователя
+const updateUserProfile = async (req, res) => {
+    try {
+        const { name, currentPassword, newPassword } = req.body;
+        const userId = req.user.userId; // Из JWT токена
+
+        // Проверяем, что есть хотя бы одно поле для обновления
+        if (!name && !newPassword) {
+            return res.status(400).json({ 
+                message: 'Необходимо указать имя (name) или новый пароль (newPassword) для обновления.' 
+            });
+        }
+
+        // Получаем текущие данные пользователя
+        const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'Пользователь не найден.' });
+        }
+
+        const currentUser = users[0];
+        const updates = [];
+        const params = [];
+
+        // Обновление имени
+        if (name && name !== currentUser.name) {
+            updates.push('name = ?');
+            params.push(name);
+        }
+
+        // Обновление пароля
+        if (newPassword) {
+            // Проверяем, указан ли текущий пароль
+            if (!currentPassword) {
+                return res.status(400).json({ 
+                    message: 'Для смены пароля необходимо указать текущий пароль.' 
+                });
+            }
+
+            // Проверяем текущий пароль
+            const isCurrentPasswordValid = await bcrypt.compare(currentPassword, currentUser.password_hash);
+            if (!isCurrentPasswordValid) {
+                return res.status(400).json({ 
+                    message: 'Текущий пароль указан неверно.' 
+                });
+            }
+
+            // Хешируем новый пароль
+            const saltRounds = 10;
+            const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+            
+            updates.push('password_hash = ?');
+            params.push(newPasswordHash);
+        }
+
+        // Если есть что обновлять
+        if (updates.length > 0) {
+            params.push(userId); // Добавляем userId для WHERE условия
+
+            const query = `UPDATE users SET ${updates.join(', ')} WHERE id = ?`;
+            await db.query(query, params);
+
+            // Получаем обновленные данные пользователя
+            const [updatedUsers] = await db.query(
+                'SELECT id, name, email, role, created_at FROM users WHERE id = ?', 
+                [userId]
+            );
+
+            res.status(200).json({
+                message: 'Профиль успешно обновлен.',
+                user: updatedUsers[0]
+            });
+        } else {
+            res.status(400).json({ 
+                message: 'Нет данных для обновления.' 
+            });
+        }
+
+    } catch (error) {
+        console.error('Ошибка при обновлении профиля:', error);
+        res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
+    }
+};
+
+// ДОПОЛНИТЕЛЬНАЯ ФУНКЦИЯ: Удаление профиля пользователя
+const deleteUserProfile = async (req, res) => {
+    try {
+        const { password } = req.body;
+        const userId = req.user.userId;
+
+        if (!password) {
+            return res.status(400).json({ 
+                message: 'Для удаления профиля необходимо указать пароль.' 
+            });
+        }
+
+        // Получаем пользователя для проверки пароля
+        const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'Пользователь не найден.' });
+        }
+
+        const currentUser = users[0];
+
+        // Проверяем пароль
+        const isPasswordValid = await bcrypt.compare(password, currentUser.password_hash);
+        if (!isPasswordValid) {
+            return res.status(400).json({ 
+                message: 'Пароль указан неверно.' 
+            });
+        }
+
+        // Удаляем пользователя
+        await db.query('DELETE FROM users WHERE id = ?', [userId]);
+
+        res.status(200).json({
+            message: 'Профиль успешно удален.'
+        });
+
+    } catch (error) {
+        console.error('Ошибка при удалении профиля:', error);
+        res.status(500).json({ message: 'Внутренняя ошибка сервера.' });
+    }
+};
+
+// Экспортируем все функции
 module.exports = {
     registerUser,
     loginUser,
-    getUserProfile
+    getUserProfile,
+    updateUserProfile,
+    deleteUserProfile
 };
