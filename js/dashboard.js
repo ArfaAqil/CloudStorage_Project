@@ -1,4 +1,3 @@
-// dashboard.js
 document.addEventListener('DOMContentLoaded', () => {
     requireAuth(); // Redirect if not logged in
 
@@ -13,12 +12,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load dashboard data
     function loadDashboard(searchQuery = '') {
         const currentUser = Storage.getCurrentUser();
+        
         const projects = Storage.getProjects().filter(
             p => (p.owner === currentUser.email || p.sharedWith.includes(currentUser.email)) &&
                  (searchQuery ? p.name.toLowerCase().includes(searchQuery.toLowerCase()) : true)
         );
-        const items = Storage.getItems().filter(
-            i => projects.some(p => p.id === Number(i.parentId)) &&
+
+        const allItems = Storage.getItems();
+        
+        let validParentIds = new Set(projects.map(p => String(p.id)));
+
+        let foundNewFolders = true;
+        while (foundNewFolders) {
+            foundNewFolders = false;
+            allItems.forEach(item => {
+                if (item.type === 'folder' && !validParentIds.has(String(item.id))) {
+                    if (validParentIds.has(String(item.parentId))) {
+                        validParentIds.add(String(item.id));
+                        foundNewFolders = true;
+                    }
+                }
+            });
+        }
+
+        const items = allItems.filter(
+            i => validParentIds.has(String(i.parentId)) &&
                  (searchQuery ? i.name.toLowerCase().includes(searchQuery.toLowerCase()) : true)
         );
 
